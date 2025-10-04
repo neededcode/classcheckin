@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه زمانی کلاس‌ها - تخصصی و عمومی</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'AbarLowFaNum';
+            src: url('otf/AbarLowFaNum-Regular.otf') format('opentype');
+            font-weight: 400; 
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'AbarLowFaNum';
+            src: url('otf/AbarLowFaNum-Bold.otf') format('opentype');
+            font-weight: 800; 
+            font-style: normal;
+        }
+
+        :root {
+            --dark-bg: #121212;
+            --card-bg: #1F1F1F; 
+            
+            --primary-red: #E74C3C; 
+            --light-red-glow: rgba(231, 76, 60, 0.15); 
+            --primary-green: #2ECC71; 
+            --light-green-glow: rgba(46, 204, 113, 0.15); 
+            
+            --light-text: #F0F0F0;
+            --medium-text: #A0A0A0;
+            --shadow-dark: 0 8px 25px rgba(0, 0, 0, 0.6); 
+            --border-radius: 14px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'AbarLowFaNum', 'Vazirmatn', sans-serif; 
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 25px;
+            line-height: 1.6;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        
+        .container.is-blurred > *:not(#classForm) {
+            filter: blur(4px) brightness(0.7); 
+            pointer-events: none; 
+            transition: filter 0.3s ease;
+        }
+        
+        #classForm.active {
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--light-text);
+            margin-bottom: 20px; 
+        }
+        
+        .btn {
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add {
+            background-color: var(--primary-red);
+            color: var(--light-text);
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            display: block;
+            margin: 20px auto 30px; 
+            border-radius: 30px;
+            box-shadow: 0 8px 20px var(--light-red-glow);
+        }
+        
+        .btn-add:hover {
+            background-color: #C0392B;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px var(--light-red-glow);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 35px; 
+            margin-top: 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--medium-text);
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .legend-major {
+            background-color: var(--primary-red);
+            box-shadow: 0 0 3px var(--primary-red);
+        }
+
+        .legend-minor {
+            background-color: var(--primary-green);
+            box-shadow: 0 0 3px var(--primary-green);
+        }
+
+        .class-item {
+            border-radius: var(--border-radius);
+            padding: 20px 25px;
+            margin-bottom: 18px;
+            box-shadow: var(--shadow-dark); 
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s; 
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid transparent; 
+            cursor: grab; 
+        }
+
+        .class-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .class-item.major {
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(231, 76, 60, 0.08) 100%);
+            
+            box-shadow: 
+                0 0 0 1px var(--primary-red), 
+                0 0 5px 0.5px var(--light-red-glow), 
+                var(--shadow-dark); 
+        }
+
+        .class-item.minor {
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(46, 204, 113, 0.08) 100%);
+
+             box-shadow: 
+                0 0 0 1px var(--primary-green), 
+                0 0 5px 0.5px var(--light-green-glow), 
+                var(--shadow-dark); 
+        }
+
+        .class-item:hover.major {
+            box-shadow: 
+                0 0 0 1px var(--primary-red),
+                0 0 8px 1px var(--light-red-glow),
+                var(--shadow-dark);
+        }
+        
+        .class-item:hover.minor {
+            box-shadow: 
+                0 0 0 1px var(--primary-green),
+                0 0 8px 1px var(--light-green-glow),
+                var(--shadow-dark);
+        }
+        
+        .drag-over {
+            border-bottom: 3px solid var(--primary-red) !important; 
+            transform: translateY(2px); 
+        }
+
+        .class-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            color: var(--light-text);
+        }
+
+        .class-details {
+            display: flex;
+            gap: 20px;
+            font-size: 0.95rem;
+            color: var(--medium-text);
+        }
+
+        .class-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .class-detail-item i {
+            color: var(--medium-text);
+        }
+        
+        .class-actions {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit {
+            background-color: transparent;
+            color: var(--primary-red);
+            padding: 8px;
+        }
+
+        .btn-delete {
+            background-color: transparent;
+            color: var(--medium-text);
+            padding: 8px;
+        }
+
+        .btn-edit:hover, .btn-delete:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow-dark);
+            margin-bottom: 30px;
+            display: none;
+            border-top: 5px solid var(--primary-red);
+        }
+
+        .form-container.active {
+            display: block;
+        }
+        
+        #formTitle {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--primary-red);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--medium-text);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #2a2a2a;
+            color: var(--light-text);
+            transition: border-color 0.2s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px var(--light-red-glow);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 10px 25px;
+        }
+
+        .btn-cancel {
+            background-color: #555;
+            color: white;
+            padding: 10px 25px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--medium-text);
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-dark);
+            font-size: 1.1rem;
+        }
+
+        #shortcutIcon {
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%) scale(1.2); 
+            z-index: 1000; 
+            background: rgba(231, 76, 60, 0.9); 
+            color: white; 
+            padding: 20px 25px;
+            border-radius: 50%; 
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5); 
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; 
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>برنامه زمانی کلاس‌ها</h1>
+        </header>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color legend-major"></div>
+                <span>تخصصی</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-minor"></div>
+                <span>عمومی</span>
+            </div>
+        </div>
+
+        <button class="btn btn-add" id="addClassBtn"><i class="fas fa-plus-circle"></i> افزودن کلاس جدید</button>
+
+        <div class="form-container" id="classForm">
+            <h2 id="formTitle">افزودن کلاس جدید</h2>
+            <form id="classFormElement">
+                <div class="form-group">
+                    <label for="className">نام کلاس</label>
+                    <input type="text" id="className" required>
+                </div>
+                <div class="form-group">
+                    <label for="classType">نوع کلاس</label>
+                    <select id="classType" required>
+                        <option value="major">تخصصی</option>
+                        <option value="minor">عمومی</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="classDate">تاریخ</label>
+                    <input type="text" id="classDate" placeholder="مثال: 1404/10/25" required>
+                </div>
+                <div class="form-group">
+                    <label for="classTime">زمان</label>
+                    <input type="text" id="classTime" placeholder="مثال: 10:00 الی 12:00" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">لغو</button>
+                    <button type="submit" class="btn btn-submit">ذخیره</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="class-list" id="classList">
+            
+        </div>
+    </div>
+    
+    <div id="shortcutIcon">
+        <i class="fas fa-plus-circle"></i>
+    </div>
+
+    <script>
+        const initialClasses = [
+            { id: 1, name: "اندیشه اسلامی (۱)", type: "minor", date: "1404/10/25", time: "10:00 الی 12:00" }, 
+            { id: 2, name: "انگلیسی عمومی", type: "minor", date: "1404/10/25", time: "13:00 الی 15:00" }, 
+            { id: 3, name: "چینی میانه (زونخه)", type: "major", date: "1404/10/28", time: "08:00 الی 09:30" }, 
+            { id: 4, name: "علائم نوشتاری (شیه زوو)", type: "major", date: "1404/11/04", time: "10:00 الی 11:30" }, 
+            { id: 5, name: "درآمدی بر ادبیات چینی (تینگلی)", type: "major", date: "1404/11/05", time: "10:00 الی 11:30" }, 
+            { id: 6, name: "زبان فارسی", type: "minor", date: "1404/11/09", time: "13:00 الی 15:00" }, 
+            { id: 7, name: "بحث و مکالمه (کویو)", type: "major", date: "1404/11/11", time: "13:30 الی 15:00" } 
+        ];
+
+        let classes = JSON.parse(localStorage.getItem('classes')) || initialClasses;
+        let editingId = null;
+        let dragSrcEl = null; 
+
+        
+        const classList = document.getElementById('classList');
+        const classForm = document.getElementById('classForm');
+        const classFormElement = document.getElementById('classFormElement');
+        const addClassBtn = document.getElementById('addClassBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const formTitle = document.getElementById('formTitle');
+        const shortcutIcon = document.getElementById('shortcutIcon');
+        const container = document.querySelector('.container');
+        let iconTimeout;
+
+        
+        function handleDragStart(e) {
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.getAttribute('data-id'));
+            this.style.opacity = '0.4'; 
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault(); 
+            }
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            
+            this.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.stopPropagation(); 
+            this.classList.remove('drag-over');
+
+            if (dragSrcEl !== this) {
+                const dragId = parseInt(dragSrcEl.getAttribute('data-id'));
+                const dropId = parseInt(this.getAttribute('data-id'));
+
+                const dragIndex = classes.findIndex(c => c.id === dragId);
+                const dropIndex = classes.findIndex(c => c.id === dropId);
+                
+                
+                const [draggedItem] = classes.splice(dragIndex, 1);
+
+                
+                classes.splice(dropIndex, 0, draggedItem);
+                
+                
+                saveClasses();
+                renderClasses();
+            }
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            
+            this.style.opacity = '1';
+            document.querySelectorAll('.class-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            dragSrcEl = null;
+        }
+        
+
+        
+        function renderClasses() {
+            classList.innerHTML = '';
+
+            if (classes.length === 0) {
+                classList.innerHTML = '<div class="empty-state">هیچ کلاسی اضافه نشده است. برای شروع بر روی "افزودن کلاس جدید" کلیک کنید.</div>';
+                return;
+            }
+
+            
+            const classesToRender = [...classes]; 
+
+            classesToRender.forEach(cls => {
+                const classItem = document.createElement('div');
+                classItem.className = `class-item ${cls.type}`;
+                classItem.setAttribute('data-id', cls.id); 
+                classItem.setAttribute('draggable', 'true'); 
+                
+                
+                classItem.addEventListener('dragstart', handleDragStart);
+                classItem.addEventListener('dragover', handleDragOver);
+                classItem.addEventListener('dragenter', handleDragEnter);
+                classItem.addEventListener('dragleave', handleDragLeave);
+                classItem.addEventListener('drop', handleDrop);
+                classItem.addEventListener('dragend', handleDragEnd);
+
+                classItem.innerHTML = `
+                    <div class="class-actions">
+                        <button class="btn btn-edit" data-id="${cls.id}" title="ویرایش"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-delete" data-id="${cls.id}" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="class-title">${cls.name}</div>
+                    <div class="class-details">
+                        <span class="class-detail-item"><i class="fas fa-calendar-alt"></i> ${cls.date}</span>
+                        <span class="class-detail-item"><i class="fas fa-clock"></i> ${cls.time}</span>
+                    </div>
+                `;
+                classList.appendChild(classItem);
+            });
+
+            
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    editClass(id);
+                });
+            });
+
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    deleteClass(id);
+                });
+            });
+        }
+
+        
+        function addClass(classData) {
+            const newClass = { id: Date.now(), ...classData };
+            classes.push(newClass);
+            saveClasses();
+            renderClasses();
+            hideForm();
+        }
+
+        function editClass(id) {
+            const cls = classes.find(c => c.id === id);
+            if (cls) {
+                document.getElementById('className').value = cls.name;
+                document.getElementById('classType').value = cls.type;
+                document.getElementById('classDate').value = cls.date;
+                document.getElementById('classTime').value = cls.time;
+                
+                editingId = id;
+                formTitle.textContent = 'ویرایش کلاس';
+                showForm();
+            }
+        }
+
+        function updateClass(id, classData) {
+            const index = classes.findIndex(c => c.id === id);
+            if (index !== -1) {
+                classes[index] = { id, ...classData };
+                saveClasses();
+                renderClasses();
+                hideForm();
+            }
+        }
+
+        function deleteClass(id) {
+            
+            const customConfirm = (message, callback) => {
+                 
+                 console.warn("Using console log instead of native confirmation due to sandbox restrictions.");
+                 console.log(`Confirmation required: ${message}`);
+                 
+                 callback(true);
+            };
+            
+            
+            customConfirm('آیا از حذف این کلاس مطمئن هستید؟', (result) => {
+                if (result) {
+                    classes = classes.filter(c => c.id !== id);
+                    saveClasses();
+                    renderClasses();
+                }
+            });
+        }
+
+        function saveClasses() {
+            localStorage.setItem('classes', JSON.stringify(classes));
+        }
+
+        
+        function showForm() {
+            classForm.classList.add('active');
+            addClassBtn.style.display = 'none';
+            container.classList.add('is-blurred');
+        }
+
+        function hideForm() {
+            classForm.classList.remove('active');
+            classFormElement.reset();
+            editingId = null;
+            formTitle.textContent = 'افزودن کلاس جدید';
+            addClassBtn.style.display = 'block';
+            container.classList.remove('is-blurred');
+        }
+
+        
+        addClassBtn.addEventListener('click', () => {
+             hideForm(); 
+             formTitle.textContent = 'افزودن کلاس جدید';
+             showForm();
+        });
+
+        cancelBtn.addEventListener('click', hideForm);
+
+        classFormElement.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const classData = {
+                name: document.getElementById('className').value,
+                type: document.getElementById('classType').value,
+                date: document.getElementById('classDate').value,
+                time: document.getElementById('classTime').value
+            };
+
+            if (editingId) {
+                updateClass(editingId, classData);
+            } else {
+                addClass(classData);
+            }
+        });
+        
+        
+        document.addEventListener('keydown', (e) => {
+            
+            if (e.key === 'a' || e.key === 'A') {
+                const isFormActive = classForm.classList.contains('active');
+                
+                
+                if (!isFormActive) {
+                    e.preventDefault(); 
+                    showForm();
+                    document.getElementById('className').focus();
+                }
+
+                
+                clearTimeout(iconTimeout);
+                shortcutIcon.style.display = 'block';
+                
+                void shortcutIcon.offsetWidth; 
+                shortcutIcon.style.opacity = '1';
+                shortcutIcon.style.transform = 'translate(-50%, -50%) scale(1)';
+
+                iconTimeout = setTimeout(() => {
+                    shortcutIcon.style.opacity = '0';
+                    shortcutIcon.style.transform = 'translate(-50%, -50%) scale(1.2)';
+
+                    
+                    setTimeout(() => {
+                        shortcutIcon.style.display = 'none';
+                    }, 300); 
+                }, 500); 
+            }
+        });
+
+
+        
+        renderClasses();
+    </script>
+</body>
+</html>
