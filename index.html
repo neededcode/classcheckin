@@ -6,8 +6,20 @@
     <title>برنامه زمانی کلاس‌ها - تخصصی و عمومی</title>
     <!-- تنظیم رنگ نوار بالای مرورگر (Theme Color) برای هماهنگی با حالت دارک -->
     <meta name="theme-color" content="#121212"> 
-    <!-- افزودن آیکون (Favicon) با استفاده از اموجی ساعت -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
+    <!-- افزودن آیکون (Favicon) با استفاده از SVG مینیمال برای ظاهر حرفه‌ای‌تر -->
+    <link rel="icon" href="data:image/svg+xml,
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+            <defs>
+                <style>
+                    .cls-1{fill:white;stroke:#E74C3C;stroke-width:5px;}
+                    .cls-2{fill:#E74C3C;}
+                </style>
+            </defs>
+            <circle class='cls-1' cx='50' cy='50' r='45'/>
+            <path class='cls-2' d='M50,15V35M50,65V85M65,50h20M15,50h20'/>
+            <circle class='cls-2' cx='50' cy='50' r='5'/>
+            <path fill='none' stroke='#2ECC71' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' d='M35 55 L45 65 L65 40'/>
+        </svg>">
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
